@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a7bd5;
+            --primary-dark: #2d67b9;
+            --secondary: #00d2ff;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e4e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            animation: pulse 15s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(5%, 5%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .header-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-link {
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .home-link:hover {
+            opacity: 1;
+            transform: translateX(-3px);
+        }
+
+        .home-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Main Content */
+        main {
+            padding: 0 0 4rem;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, rgba(58, 123, 213, 0.1) 0%, rgba(0, 210, 255, 0.1) 100%);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+        /* Table styles */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background-color: var(--light-gray);
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #ddd;
+            position: relative;
+        }
+
+        th:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        th:hover:after {
+            transform: scaleX(1);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            color: var(--gray);
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(58, 123, 213, 0.05);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Buttons & Actions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 6px rgba(58, 123, 213, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(58, 123, 213, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(58, 123, 213, 0.05);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--dark);
+            border: 1px solid var(--light-gray);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gray);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-view {
+            background: transparent;
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            border: 1px solid var(--primary);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-view i {
+            font-size: 0.75rem;
+            margin-right: 0.3rem;
+        }
+
+        .btn-view:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Search Box */
+        .search-box {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+        }
+
+        .search-input i {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        .page-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .page-info {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            gap: 0.3rem;
+        }
+
+        .pagination a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            border: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover,
+        .pagination a.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination a.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: var(--gray);
+            border: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .action-btn:hover {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+
+        .action-btn.edit:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .action-btn.delete:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.7;
+        }
+
+        /* Quick Action Bar */
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-action-card {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .quick-action-content h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .quick-action-content p {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .quick-actions {
+                flex-wrap: wrap;
+            }
+
+            .quick-action-card {
+                flex: 0 0 calc(50% - 0.5rem);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .quick-action-card {
+                flex: 0 0 100%;
+            }
+
+            .home-link {
+                top: 1rem;
+                left: 1rem;
+            }
+
+            .pagination {
+                margin-top: 1rem;
+            }
+
+            .page-controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .panel {
+                border-radius: 0;
+                margin-left: -20px;
+                margin-right: -20px;
+                width: calc(100% + 40px);
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/" class="home-link">
+        <i class="fas fa-home"></i> Home
+    </a>
+    <div class="header-content">
+        <h1>Registered Vehicles</h1>
+    </div>
+</header>
+
+<div class="container">
+    <main>
+        <div class="quick-actions">
+            <a href="/vehicles/register" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="quick-action-content">
+                    <h3>Register New Vehicle</h3>
+                    <p>Add a new vehicle to the system</p>
+                </div>
+            </a>
+
+            <a href="/search" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="quick-action-content">
+                    <h3>Advanced Search</h3>
+                    <p>Find vehicles by specific criteria</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">All Registered Vehicles</h2>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>VIN</th>
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th>Year</th>
+                            <th>Owner</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="vehicle : ${vehicles}">
+                            <td th:text="${vehicle.vin}">ABC123456789XYZ</td>
+                            <td th:text="${vehicle.make}">Toyota</td>
+                            <td th:text="${vehicle.model}">Camry</td>
+                            <td th:text="${vehicle.year}">2023</td>
+                            <td th:text="${vehicle.owner?.name} ?: 'N/A'">John Doe</td>
+                            <td th:text="${vehicle.owner?.email} ?: 'N/A'">john@example.com</td>
+                            <td>
+                                <span class="badge badge-success">Active</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:if="${vehicle.owner != null}"
+                                       th:href="@{/registrations/customer/{id}(id=${vehicle.owner.id})}"
+                                       class="btn-view">
+                                        <i class="fas fa-id-card"></i> View
+                                    </a>
+                                    <button class="action-btn edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Sample data when no vehicles are returned -->
+                        <tr th:if="${#lists.isEmpty(vehicles)}">
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                    <h3>No Vehicles Found</h3>
+                                    <p>There are no registered vehicles in the system.</p>
+                                    <a href="/vehicles/register" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Register New Vehicle
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-controls">
+            <div class="page-info">
+                Showing <strong>1-10</strong> of <strong>42</strong> vehicles
+            </div>
+            <ul class="pagination">
+                <li><a href="#" class="disabled"><i class="fas fa-chevron-left"></i></a></li>
+                <li><a href="#" class="active">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+            </ul>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            &copy; 2025 Vehicle Registration System. All rights reserved.
+        </div>
+    </div>
+</footer>
+</body>
+</html>

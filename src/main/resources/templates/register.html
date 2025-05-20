@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a7bd5;
+            --primary-dark: #2d67b9;
+            --secondary: #00d2ff;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e4e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            animation: pulse 15s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(5%, 5%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .header-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            transform: translateX(-3px);
+        }
+
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Main Content */
+        main {
+            padding: 2rem 0 4rem;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .section-title {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            position: relative;
+            font-size: 1.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0.8rem;
+            color: var(--gray);
+        }
+
+        .input-with-icon input {
+            padding-left: 2.5rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(58, 123, 213, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(58, 123, 213, 0.4);
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(58, 123, 213, 0.05);
+            box-shadow: none;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--light-gray);
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .required-field::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 0.25rem;
+        }
+
+        .help-text {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .back-link {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/vehicles/list" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Vehicles
+    </a>
+    <div class="header-content">
+        <h1>Vehicle Registration</h1>
+    </div>
+</header>
+
+<div class="container">
+    <main>
+        <div class="form-container">
+            <form th:action="@{/vehicles/register}" th:object="${vehicle}" method="post">
+                <div class="form-section">
+                    <h2 class="section-title">Vehicle Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="vin" class="required-field">Vehicle Identification Number (VIN)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-fingerprint"></i>
+                                <input type="text" id="vin" th:field="*{vin}" required placeholder="Enter 17-character VIN">
+                            </div>
+                            <span class="help-text">The unique 17-character identifier for your vehicle</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year" class="required-field">Year</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                                <input type="number" id="year" th:field="*{year}" required min="1900" max="2025" placeholder="e.g. 2023">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="make" class="required-field">Make</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-industry"></i>
+                                <input type="text" id="make" th:field="*{make}" required placeholder="e.g. Toyota">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="model" class="required-field">Model</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-car"></i>
+                                <input type="text" id="model" th:field="*{model}" required placeholder="e.g. Camry">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="color" class="required-field">Color</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-palette"></i>
+                                <input type="text" id="color" th:field="*{color}" required placeholder="e.g. Silver">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="licensePlate">License Plate</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-id-card"></i>
+                                <input type="text" id="licensePlate" name="licensePlate" placeholder="e.g. ABC123">
+                            </div>
+                            <span class="help-text">Leave blank if applying for new plates</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">Owner Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ownerName" class="required-field">Full Name</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="ownerName" name="ownerName" required placeholder="Enter full legal name">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ownerEmail" class="required-field">Email</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="ownerEmail" name="ownerEmail" required placeholder="Enter email address">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ownerPhone" class="required-field">Phone</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="ownerPhone" name="ownerPhone" required placeholder="e.g. (123) 456-7890">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="driverLicense" class="required-field">Driver's License Number</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-id-badge"></i>
+                                <input type="text" id="driverLicense" name="driverLicense" required placeholder="Enter driver's license number">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="ownerAddress" class="required-field">Address</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-home"></i>
+                                <input type="text" id="ownerAddress" name="ownerAddress" required placeholder="Enter street address">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city" class="required-field">City</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-city"></i>
+                                <input type="text" id="city" name="city" required placeholder="Enter city">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state" class="required-field">State</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="state" name="state" required placeholder="Enter state">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="zipCode" class="required-field">ZIP Code</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-pin"></i>
+                                <input type="text" id="zipCode" name="zipCode" required placeholder="Enter ZIP code">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-check"></i> Register Vehicle
+                    </button>
+                </div>
+
+                <div class="form-footer">
+                    <p>By submitting this form, you certify that all information provided is accurate and complete.</p>
+                    <p>Need help? <a href="/contact">Contact Support</a></p>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            &copy; 2025 Vehicle Registration System. All rights reserved.
+        </div>
+    </div>
+</footer>
+</body>
+</html>

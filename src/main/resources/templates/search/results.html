@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Search Results</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header styles */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin: 30px 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background-color: #3498db;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        tbody tr {
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f6f9;
+        }
+
+        tbody tr:hover {
+            background-color: #e6f7ff;
+            transform: scale(1.01);
+        }
+
+        /* Links and buttons */
+        .action-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        a {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        a:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        a.secondary {
+            background-color: #95a5a6;
+        }
+
+        a.secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+
+            .action-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Vehicle Search Results</h1>
+<table>
+    <thead>
+    <tr>
+        <th>VIN</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>Color</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="vehicle : ${results}">
+        <td th:text="${vehicle.vin}"></td>
+        <td th:text="${vehicle.make}"></td>
+        <td th:text="${vehicle.model}"></td>
+        <td th:text="${vehicle.year}"></td>
+        <td th:text="${vehicle.color}"></td>
+    </tr>
+    </tbody>
+</table>
+<div class="action-links">
+    <a th:href="@{/search}">New Search</a>
+    <a href="/vehicles/list" class="secondary">View All Vehicles</a>
+</div>
+</body>
+</html>
